@@ -1,5 +1,4 @@
 from pytchat import LiveChatAsync
-import time
 import asyncio
 import logging
 import re
@@ -8,9 +7,6 @@ import urllib.request
 
 class LiveChatProcessor:
     def __init__(self, roomid, seektime=0):
-        if len(roomid) == 24:
-            logging.info('channelId:'+roomid)
-            roomid = channelId2videoId(roomid)
         logging.info('roomid:'+roomid+' seektime:'+str(seektime))
         self.queue = asyncio.Queue()
         self.livechat = LiveChatAsync(
@@ -39,16 +35,8 @@ class LiveChatProcessor:
         return msgjson
 
     def terminate(self):
-        self.livechat.terminate()
-
-
-def channelId2videoId(channelId):
-    fp = urllib.request.urlopen(
-        f"https://www.youtube.com/channel/{channelId}/live")
-    mybytes = fp.read()
-    fp.close()
-    htmlsource = mybytes.decode("utf-8")
-    return re.search(r'(?<="videoId\\":\\")(.*?)(?=\\",)', htmlsource).group()
+        if not self.livechat is None:
+            self.livechat.terminate()
 
 
 def test_chat():
