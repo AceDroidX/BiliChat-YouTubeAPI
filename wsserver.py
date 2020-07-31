@@ -14,8 +14,11 @@ async def wsserver(websocket, path):
     try:
         while not websocket.closed:
             msgjson = await chat.getchat()
+            if msgjson is None:
+                await asyncio.sleep(0.1)
+                continue
             logging.info('websocket.text:'+str(msgjson))
-            await websocket.send(str(msgjson))
+            await websocket.send(json.dumps(msgjson,ensure_ascii=False))
     except websockets.ConnectionClosed as e:
         logging.error("err:"+'websockets.ConnectionClosed')
     finally:

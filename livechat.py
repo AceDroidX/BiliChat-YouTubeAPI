@@ -27,10 +27,14 @@ class LiveChatProcessor:
          'author': {'name': c.author.name, 'channelId': c.author.channelId, 'imageUrl': c.author.imageUrl, 'isChatOwner': c.author.isChatOwner, 'isChatModerator': c.author.isChatModerator}}
 
     async def getchat(self):
+        if self.queue.qsize()==0:
+            return None
         msgjson = await self.queue.get()
         logging.debug('getchat:'+str(msgjson))
         return msgjson
 
+    def terminate(self):
+        self.livechat.terminate()
 
 if __name__ == '__main__':
     LOG_FORMAT = "[%(asctime)s]%(levelname)s > %(message)s"
