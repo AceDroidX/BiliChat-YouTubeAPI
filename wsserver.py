@@ -32,7 +32,7 @@ async def wsserver(websocket, path):
             await websocket.send(json.dumps(msgjson, ensure_ascii=False))
     except websockets.ConnectionClosed as e:
         logging.error("err:"+'websockets.ConnectionClosed')
-    except websockets.ConnectionClosed as e:
+    except BaseException as e:
         logging.error("err:"+str(e))
     finally:
         if not websocket.closed:
