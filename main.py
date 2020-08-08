@@ -8,8 +8,9 @@ routes = [
     (r'/.*', wsserver.wsserver)
 ]
 
+
 def run_server():
-    host, port=('0.0.0.0',8085)
+    host, port = ('0.0.0.0', 8085)
     app = tornado.web.Application(
         routes,
         websocket_ping_interval=10,
@@ -23,6 +24,7 @@ def run_server():
         return
     logging.info('Server started: %s:%d', host, port)
     tornado.ioloop.IOLoop.current().start()
+
 
 if __name__ == '__main__':
     LOG_FORMAT = "%(asctime)s[%(levelname)s]%(threadName)s--%(name)s>%(message)s"

@@ -5,7 +5,7 @@ import logging
 
 class LiveChatProcessor:
 
-    def __init__(self, videoid, msghandler, seektime=970):
+    def __init__(self, videoid, msghandler, seektime=0):
         self.videoid = videoid
         self.msghandler = msghandler
         logging.info('videoid:'+videoid+' seektime:'+str(seektime))
@@ -27,7 +27,7 @@ class LiveChatProcessor:
                 'author': {'name': c.author.name, 'channelId': c.author.channelId, 'imageUrl': c.author.imageUrl, 'isChatOwner': c.author.isChatOwner, 'isChatModerator': c.author.isChatModerator}}
 
     def sendChat(self, msg):
-        self.msghandler.send_message(msg)
+        self.msghandler.send_message(msg, self.videoid)
 
     def terminate(self):
         if not self.livechat is None:

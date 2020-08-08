@@ -28,13 +28,16 @@ class wsserver(tornado.websocket.WebSocketHandler):
         # if not websocket.closed:
         #     websocket.close()
         if not self.chat is None:
-            manager.terminate(self.chat.videoid)
+            manager.terminate(self.chat.videoid, self)
 
     def send_message(self, message):
         try:
             self.write_message(message)
         except tornado.websocket.WebSocketClosedError:
             self.on_close()
+
+    def check_origin(self, origin):
+        return True
 
 
 manager = ChatManager.LiveChatManager()

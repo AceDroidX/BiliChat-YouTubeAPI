@@ -12,6 +12,7 @@ class LiveChatManager:
 
     async def add(self, id, wsserver):
         logging.debug(f'LiveChatManager.add.id:{id}')
+        # videoid = id  # debug
         while True:
             videoid = await youtube_util.getLiveVideoId(id)  # debug
             if videoid is None:
@@ -19,19 +20,34 @@ class LiveChatManager:
                 continue
             else:
                 break
-        chat = self.getChat(videoid, wsserver)
+        chat = self.getChat(videoid)
+        self.addwsserver(videoid, wsserver)
         wsserver.set_chat(chat)
 
-    def getChat(self, videoid, msghandler):
+    def addwsserver(self, videoid, wsserver):
+        if not 'wsserver' in self.chatList[videoid]:
+            self.chatList[videoid]['wsserver'] = []
+        self.chatList[videoid]['wsserver'].append(wsserver)
+
+    def getChat(self, videoid):
         if videoid in self.chatList:
             self.chatList[videoid]['using'] += 1
             return self.chatList[videoid]['chat']
         self.chatList[videoid] = {
-            'chat': livechat.LiveChatProcessor(videoid, msghandler), 'using': 1}
+            'chat': livechat.LiveChatProcessor(videoid, self), 'using': 1}
         return self.chatList[videoid]['chat']
 
-    def terminate(self, videoid):
+    def send_message(self, msg, videoid):
         if videoid in self.chatList:
+            for wsserver in self.chatList[videoid]['wsserver']:
+                wsserver.send_message(msg)
+        else:
+            logging.warning(
+                f'LiveChatManager.send_message:videoid not in self.chatList')
+
+    def terminate(self, videoid, wsserver):
+        if videoid in self.chatList:
+            self.chatList[videoid]['wsserver'].remove(wsserver)
             self.chatList[videoid]['using'] -= 1
             if self.chatList[videoid]['using'] <= 0:
                 self.chatList[videoid]['chat'].terminate()
