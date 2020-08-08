@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import livechat
+import youtube_util
 
 
 class LiveChatManager:
@@ -9,18 +10,30 @@ class LiveChatManager:
     def __init__(self):
         pass
 
-    def get(self, videoid):
+    async def add(self, id, wsserver):
+        logging.debug(f'LiveChatManager.add.id:{id}')
+        while True:
+            videoid = await youtube_util.getLiveVideoId(id)  # debug
+            if videoid is None:
+                await asyncio.sleep(10)
+                continue
+            else:
+                break
+        chat = self.getChat(videoid, wsserver)
+        wsserver.set_chat(chat)
+
+    def getChat(self, videoid, msghandler):
         if videoid in self.chatList:
-            self.chatList[videoid]['using']+=1
+            self.chatList[videoid]['using'] += 1
             return self.chatList[videoid]['chat']
         self.chatList[videoid] = {
-            'chat': livechat.LiveChatProcessor(videoid), 'using': 1}
+            'chat': livechat.LiveChatProcessor(videoid, msghandler), 'using': 1}
         return self.chatList[videoid]['chat']
 
     def terminate(self, videoid):
         if videoid in self.chatList:
-            self.chatList[videoid]['using']-=1
-            if self.chatList[videoid]['using']<=0:
+            self.chatList[videoid]['using'] -= 1
+            if self.chatList[videoid]['using'] <= 0:
                 self.chatList[videoid]['chat'].terminate()
                 self.chatList.pop(videoid)
                 logging.info(f'[{videoid}]chat已关闭')

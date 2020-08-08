@@ -4,30 +4,30 @@ import logging
 
 
 class LiveChatProcessor:
-    msgjson = None
 
-    def __init__(self, roomid, seektime=0):
-        self.roomid = roomid
-        logging.info('roomid:'+roomid+' seektime:'+str(seektime))
+    def __init__(self, videoid, msghandler, seektime=970):
+        self.videoid = videoid
+        self.msghandler = msghandler
+        logging.info('videoid:'+videoid+' seektime:'+str(seektime))
         self.livechat = LiveChatAsync(
-            video_id=roomid, callback=self.chatProcessor, seektime=seektime)
+            video_id=videoid, callback=self.chatProcessor, seektime=seektime)
 
     # callback function (automatically called)
     async def chatProcessor(self, chatdata):
-        logging.debug(f'[{self.roomid}]chatProcessor')
+        logging.debug(f'[{self.videoid}]chatProcessor')
         for c in chatdata.items:
             # logging.debug('chatdata.items.c\ndatetime:'+c.datetime)
             if c.author.isChatModerator or c.author.isChatOwner:
                 logging.info('Chat:'+c.author.name+'\n'+c.message)
-                self.msgjson = self.chatRendererToJson(c)
+                self.sendChat(self.chatRendererToJson(c))
             await chatdata.tick_async()
 
     def chatRendererToJson(self, c):
         return {'type': c.type, 'message': c.message, 'timestamp': c.timestamp, 'datetime': c.datetime,
                 'author': {'name': c.author.name, 'channelId': c.author.channelId, 'imageUrl': c.author.imageUrl, 'isChatOwner': c.author.isChatOwner, 'isChatModerator': c.author.isChatModerator}}
 
-    async def getchat(self):
-        return self.msgjson
+    def sendChat(self, msg):
+        self.msghandler.send_message(msg)
 
     def terminate(self):
         if not self.livechat is None:
