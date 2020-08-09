@@ -1,12 +1,12 @@
-# WS server example
-
 import asyncio
-import livechat
 import logging
 import json
-import ChatManager
 import time
 import tornado.websocket
+import sys,os,inspect
+sys.path.append(os.path.realpath(os.path.dirname(inspect.getfile(inspect.currentframe()))))
+import livechat
+import ChatManager
 
 
 class wsserver(tornado.websocket.WebSocketHandler):

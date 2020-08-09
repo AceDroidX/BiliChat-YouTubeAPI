@@ -1,8 +1,10 @@
-import wsserver
-import livechat
 import asyncio
 import logging
 import tornado
+import sys,os,inspect
+sys.path.append(os.path.realpath(os.path.dirname(inspect.getfile(inspect.currentframe()))))
+import wsserver
+import livechat
 
 routes = [
     (r'/.*', wsserver.wsserver)

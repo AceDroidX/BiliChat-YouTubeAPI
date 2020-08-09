@@ -1,9 +1,9 @@
 import asyncio
 import logging
-import livechat
+import sys,os,inspect
+sys.path.append(os.path.realpath(os.path.dirname(inspect.getfile(inspect.currentframe()))))
 import youtube_util
-
-
+import livechat
 class LiveChatManager:
     chatList = {}
 
